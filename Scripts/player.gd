@@ -1,15 +1,21 @@
 extends CharacterBody2D
 
 #this declares a int variable and sets it equal to 300 (we will use this when moving)
-const SPEED:int = 300
-const JUMP_VELOCITY = -400.0
-const GRAVITY = 200
+const SPEED:int = 500
+const JUMP_VELOCITY = -500.0
+const GRAVITY = 500
+const ACCELERATION = 800
+const FRICTION = 1000.0
+
+
 # Called when the node enters the scene tree for the first time.
 func _ready() -> void:
 	pass
 
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
+
+#inside of this function check the velocity of the player and flip the sprite if the player is facing left and flip it back if player is facing right
 func _process(delta: float) -> void:
 	pass
 
@@ -20,8 +26,9 @@ func _input(event):
 	# is_action_pressed needs a string parameter which is the name of the action
 	
 	#the method is_on_floor() returns true if the player is currently on the floor so you cant jump mid air
-	if event.is_action_pressed() and is_on_floor():
+	if event.is_action_pressed("jump") and is_on_floor():
 		#call your jump method here
+		jump()
 		pass
 	pass
 
@@ -29,16 +36,23 @@ func _input(event):
 # If the key is being pressed adjust the velocity of the character
 # delta is the amount of time inbetween frames, any movement should be multiplied by delta before
 func _physics_process(delta):
+	var direction = Input.get_axis("move left", "move right")
 	#if the player is currently not on the floor make the player fall by decreasing Y velocity
 	if not is_on_floor():
-		pass
+		velocity.y += GRAVITY * delta
 	
 	# In here you adjust the velocity depending on which input is being pressed (the name of the action is the name you give it in your input map)
 	# is_action_pressed needs a string parameter
-	if Input.is_action_pressed():
-		pass
+	#look up the function move_toward (this helps the movement feel smooth)
+	if Input.is_action_pressed("move right") or Input.is_action_pressed("move left"):
+		velocity.x = move_toward(velocity.x,direction * SPEED,ACCELERATION * delta)
+	else:
+		velocity.x = move_toward(velocity.x,0,FRICTION * delta )
+	
 		# change velocity	
+	move_and_slide()
 
 func jump():
-	# change player 
+	# change player Y velocity using jump velocity variable
+	velocity.y = JUMP_VELOCITY
 	pass
